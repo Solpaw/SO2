@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp -lncurses -pthread -o main
+	g++ main.cpp ball.cpp -lncurses -pthread -o main
