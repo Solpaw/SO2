@@ -16,13 +16,16 @@ void newBall(int maxX,int maxY, bool &end,int x,int y, int speed,vector<pair<int
         ballPosition[index].first = ball->getY();
         ballPosition[index].second = ball->getX();
         for(int i=0;i<ballPosition.size();i++) {
-            if(collisionDelay) break;
+            if(collisionDelay) break; //żeby kulki nie zderzały się ze sobą odrazu po obudzeniu
             if(i==index) continue;
             if(!ready[i]) continue;
-            if(abs(ballPosition[i].first-ballPosition[index].first)<=1 && abs(ballPosition[i].second-ballPosition[index].second)<1) {
+            //wykrycie zderzenia
+            if(abs(ballPosition[i].first-ballPosition[index].first)<=1 && abs(ballPosition[i].second-ballPosition[index].second)<1 && !hits[i]) {
+                //budzenie wszystkich kulek
                 for(int i=0;i<hits.size();i++) {
-                    hits[i] = false;
+                    if(ready[i]) hits[i] = false;
                 }
+                //uśpienie zderzających się kulek
                 hits[index] = true;
                 hits[i]=true;
                 ready[i] = false;
@@ -30,12 +33,14 @@ void newBall(int maxX,int maxY, bool &end,int x,int y, int speed,vector<pair<int
                 collisionDelay = 3;
             }
         }
+        //jeśli zderzenie nastąpiło
         if(hits[index]){
+            //wątek czekając sekundę musi rysować kulkę, inaczej nie będzie jej widać jeśli przeleci po niej inna kulka
             for(int i=0;i<1000;i++) {
                 usleep(1000);
                 ball->display(false);
             }
-            ready[index] = true;
+            ready[index] = true; //wątek gotowy do obudzenia
             while(hits[index] && !end) {
                 usleep(100);
                 ball->display(false);
@@ -78,7 +83,7 @@ void finish(bool &end) {
 
 int main (){
 
-    const int nrOfBalls = 10;
+    const int nrOfBalls = 6;
     uniform_int_distribution<int> delay(500000,1500000);
     initscr();
     noecho();
